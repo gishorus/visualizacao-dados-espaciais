@@ -1,0 +1,17 @@
+# R
+.Rhistory
+.RData
+.Ruserdata
+*.Rproj.user/
+
+# Dados gerados
+dados/*.gpkg
+dados/*.shp
+dados/*.shx
+dados/*.dbf
+mapas/*.png
+mapas/*.jpg
+
+# Sistema
+.DS_Store
+Thumbs.db
