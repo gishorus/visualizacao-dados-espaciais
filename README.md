@@ -1,47 +1,25 @@
-# 🗺️ OpenStreetMap - Belém/PA
+# 🗺️ Pipeline de Dados Espaciais: Belém/PA
 
-Pipeline automatizado em R para download e análise de dados do OpenStreetMap.
+![R](https://img.shields.io/badge/Language-R-276DC3?style=for-the-badge&logo=r)
+![Status](https://img.shields.io/badge/Status-Em_Desenvolvimento-yellow?style=for-the-badge)
+![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
-## 📍 Área de Estudo
-- **Cidade:** Belém, Pará, Brasil
-- **CRS:** SIRGAS 2000 / UTM 22S (EPSG:31982)
+Este repositório contém um pipeline de Engenharia de Dados Espaciais desenvolvido em R para extração, tratamento e visualização de dados do **OpenStreetMap (OSM)**, focado na região metropolitana de Belém, Pará.
 
-## 🚀 Como Usar
-```r
-# 1. Carregar funções
-source("R/funcoes_osm.R")
+## 🎯 Objetivos do Projeto
+- Automatizar o download de dados vetoriais (shapefiles/geopackages) de infraestrutura urbana.
+- Realizar limpeza e transformação de coordenadas (CRS).
+- Produzir visualizações cartográficas temáticas.
 
-# 2. Executar exemplo de Belém
-source("R/exemplo_belem.R")
-```
+## 🛠️ Tecnologias Utilizadas
+- **Linguagem:** R (versão 4.x)
+- **Principais Bibliotecas:**
+  - `sf`: Simple Features (manipulação geométrica)
+  - `osmdata`: Interface com a API do OpenStreetMap
+  - `ggplot2` / `tmap`: Visualização de dados
+  - `tidyverse`: Manipulação e limpeza de dados
 
-## 📦 Pacotes Necessários
-```r
-install.packages(c("osmdata", "sf", "dplyr"))
-```
-
-## 📂 Estrutura
-```
-├── R/                  # Scripts R
-├── dados/              # GeoPackages gerados
-├── mapas/              # Visualizações PNG
-├── Docs/               # Documentação
-└── Exemplos/           # Exemplos de uso
-```
-
-## 🔧 Funcionalidades
-
-- ✅ Download de malha viária
-- ✅ Pontos de interesse (hospitais, escolas, etc)
-- ✅ Áreas verdes (parques)
-- ✅ Hidrografia (rios, igarapés)
-- ✅ Exportação para GeoPackage (QGIS)
-
-## 📄 Licença
-
-MIT License
-
-## 🙏 Créditos
-
-Dados © OpenStreetMap contributors
-```
+## 🚀 Como Executar
+1. Clone este repositório:
+```bash
+git clone [https://github.com/gishorus/visualizacao-dados-espaciais.git](https://github.com/gishorus/visualizacao-dados-espaciais.git)
