@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversor de Coordenadas Geográficas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background: #f5f5f5;
+            border: none;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            color: #555;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .tab-btn.active {
+            background: #3498db;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+            font-family: 'Courier New', monospace;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .result-box {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .result-box h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .result-content {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .warning-box {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .error-box {
+            background: #ffebee;
+            border-left: 4px solid #f44336;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .coord-display {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .coord-display strong {
+            color: #2c3e50;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        th {
+            background: #3498db;
+            color: white;
+        }
+
+        tr:hover {
+            background: #f5f5f5;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+            transition: width 0.3s;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab-btn {
+                border-radius: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌍 Conversor de Coordenadas Geográficas</h1>
+            <p>Ferramenta offline para conversão e correção de coordenadas em múltiplos formatos e projeções</p>
+        </header>
+
+        <div class="main-content">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('single')">Coordenada Única</button>
+                <button class="tab-btn" onclick="switchTab('batch')">Lote (CSV/Excel)</button>
+                <button class="tab-btn" onclick="switchTab('detect')">Detectar Formato</button>
+                <button class="tab-btn" onclick="switchTab('help')">Ajuda</button>
+            </div>
+
+            <!-- Tab: Coordenada Única -->
+            <div id="single" class="tab-content active">
+                <div class="info-box">
+                    <strong>ℹ️ Instruções:</strong> Insira as coordenadas nos campos abaixo. O sistema detectará automaticamente o formato e converterá para os sistemas selecionados.
+                </div>
+
+                <div class="grid-2">
+                    <div>
+                        <div class="form-group">
+                            <label for="inputCoord1">Coordenada 1 (Latitude ou X):</label>
+                            <input type="text" id="inputCoord1" placeholder="Ex: -1.4558 ou 728304.5">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputCoord2">Coordenada 2 (Longitude ou Y):</label>
+                            <input type="text" id="inputCoord2" placeholder="Ex: -48.5039 ou 9876543.2">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputFormat">Formato de Entrada:</label>
+                            <select id="inputFormat">
+                                <option value="auto">Detectar Automaticamente</option>
+                                <option value="decimal">Graus Decimais (DD)</option>
+                                <option value="dms">Graus Minutos Segundos (DMS)</option>
+                                <option value="utm">UTM (metros)</option>
+                                <option value="tm">TM (metros)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="datumInput">Datum de Entrada:</label>
+                            <select id="datumInput">
+                                <option value="WGS84">WGS84 (GPS)</option>
+                                <option value="SAD69">SAD69</option>
+                                <option value="C67">Córrego Alegre 1967</option>
+                                <option value="SIRGAS2000">SIRGAS 2000</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="utmZone">Zona UTM (se aplicável):</label>
+                            <select id="utmZone">
+                                <option value="auto">Detectar Automaticamente</option>
+                                <option value="18">18 (Norte)</option>
+                                <option value="19">19 (Nordeste)</option>
+                                <option value="20">20 (Centro-Oeste)</option>
+                                <option value="21">21 (Sudeste)</option>
+                                <option value="22">22 (Sul/Sudeste)</option>
+                                <option value="23">23 (Sul)</option>
+                                <option value="24">24 (Sul)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="form-group">
+                            <label for="outputFormats">Formatos de Saída:</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <label><input type="checkbox" checked> Graus Decimais</label>
+                                <label><input type="checkbox" checked> DMS</label>
+                                <label><input type="checkbox" checked> UTM</label>
+                                <label><input type="checkbox"> TM</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="datumOutput">Datum de Saída:</label>
+                            <select id="datumOutput">
+                                <option value="WGS84">WGS84 (GPS)</option>
+                                <option value="SAD69">SAD69</option>
+                                <option value="SIRGAS2000">SIRGAS 2000</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn" onclick="convertSingle()">Converter</button>
+                    <button class="btn btn-secondary" onclick="clearSingle()">Limpar</button>
+                </div>
+
+                <div id="singleResult" class="result-box hidden">
+                    <h3>Resultado da Conversão</h3>
+                    <div id="singleResultContent" class="result-content"></div>
+                </div>
+            </div>
+
+            <!-- Tab: Lote -->
+            <div id="batch" class="tab-content">
+                <div class="info-box">
+                    <strong>ℹ️ Instruções:</strong> Cole seus dados no formato CSV ou faça upload de arquivo. O sistema detectará automaticamente as colunas de coordenadas.
+                </div>
+
+                <div class="form-group">
+                    <label for="batchInput">Dados CSV (cole aqui ou use upload):</label>
+                    <textarea id="batchInput" placeholder="ID,Latitude,Longitude,Nome
+1,-1.4558,-48.5039,Belém
+2,-2.5297,-44.3028,São Luís
+3,-3.1190,-60.0217,Manaus"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="fileUpload">Ou selecione um arquivo:</label>
+                    <input type="file" id="fileUpload" accept=".csv,.txt,.xlsx,.xls">
+                </div>
+
+                <div class="grid-2">
+                    <div>
+                        <div class="form-group">
+                            <label for="batchFormat">Formato das Coordenadas:</label>
+                            <select id="batchFormat">
+                                <option value="auto">Detectar Automaticamente</option>
+                                <option value="decimal">Graus Decimais</option>
+                                <option value="dms">DMS</option>
+                                <option value="utm">UTM</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="batchDatum">Datum:</label>
+                            <select id="batchDatum">
+                                <option value="WGS84">WGS84</option>
+                                <option value="SAD69">SAD69</option>
+                                <option value="SIRGAS2000">SIRGAS 2000</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="form-group">
+                            <label for="colLat">Coluna Latitude/Y:</label>
+                            <select id="colLat"><option value="">Detectar automaticamente</option></select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="colLon">Coluna Longitude/X:</label>
+                            <select id="colLon"><option value="">Detectar automaticamente</option></select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn" onclick="processBatch()">Processar Lote</button>
+                    <button class="btn btn-success" onclick="exportBatch()">Exportar CSV</button>
+                    <button class="btn btn-secondary" onclick="clearBatch()">Limpar</button>
+                </div>
+
+                <div id="batchProgress" class="hidden">
+                    <p>Processando...</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div id="batchResult" class="result-box hidden">
+                    <h3>Resultado do Processamento</h3>
+                    <div id="batchStats" class="info-box"></div>
+                    <div id="batchResultContent" class="result-content">
+                        <table id="batchTable">
+                            <thead></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Detectar Formato -->
+            <div id="detect" class="tab-content">
+                <div class="info-box">
+                    <strong>ℹ️ Instruções:</strong> Cole uma amostra de coordenadas para identificar automaticamente o formato e sistema de referência.
+                </div>
+
+                <div class="form-group">
+                    <label for="detectInput">Amostra de Coordenadas (uma por linha):</label>
+                    <textarea id="detectInput" placeholder="-1.4558, -48.5039
+S 1°27'20.88", W 48°30'14.04"
+728304.5, 9876543.2
+-01 27 20.88, -048 30 14.04"></textarea>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn" onclick="detectFormat()">Detectar Formato</button>
+                    <button class="btn btn-secondary" onclick="document.getElementById('detectInput').value = ''">Limpar</button>
+                </div>
+
+                <div id="detectResult" class="result-box hidden">
+                    <h3>Resultado da Detecção</h3>
+                    <div id="detectResultContent" class="result-content"></div>
+                </div>
+            </div>
+
+            <!-- Tab: Ajuda -->
+            <div id="help" class="tab-content">
+                <h2>📚 Guia de Uso</h2>
+                
+                <div class="info-box">
+                    <h3>Formatos Suportados</h3>
+                    <ul style="margin-top: 10px; margin-left: 20px;">
+                        <li><strong>Graus Decimais (DD):</strong> -1.4558, -48.5039</li>
+                        <li><strong>Graus Minutos Segundos (DMS):</strong> S 1°27'20.88", W 48°30'14.04"</li>
+                        <li><strong>Graus Minutos Decimais (DMM):</strong> S 1° 27.348', W 48° 30.234'</li>
+                        <li><strong>UTM:</strong> 728304.5, 9876543.2 (em metros)</li>
+                    </ul>
+                </div>
+
+                <div class="info-box">
+                    <h3>Datums Disponíveis</h3>
+                    <ul style="margin-top: 10px; margin-left: 20px;">
+                        <li><strong>WGS84:</strong> Sistema GPS mundial</li>
+                        <li><strong>SAD69:</strong> Datum Sul-Americano 1969</li>
+                        <li><strong>SIRGAS 2000:</strong> Sistema de Referência Geocêntrico para as Américas</li>
+                        <li><strong>C67:</strong> Córrego Alegre 1967</li>
+                    </ul>
+                </div>
+
+                <div class="warning-box">
+                    <h3>⚠️ Importante</h3>
+                    <ul style="margin-top: 10px; margin-left: 20px;">
+                        <li>Esta ferramenta funciona 100% offline após o carregamento</li>
+                        <li>Para conversões UTM precisas, informe a zona correta</li>
+                        <li>Coordenadas brasileiras geralmente usam zonas UTM 18-24</li>
+                        <li>Valores positivos de latitude = Norte, negativos = Sul</li>
+                        <li>Valores positivos de longitude = Leste, negativos = Oeste</li>
+                    </ul>
+                </div>
+
+                <div class="result-box">
+                    <h3>Exemplos de Uso</h3>
+                    <div class="result-content">
+                        <p><strong>Belém, PA (WGS84):</strong></p>
+                        <p>Latitude: -1.4558 | Longitude: -48.5039</p>
+                        <br>
+                        <p><strong>São Paulo, SP (UTM 22K SAD69):</strong></p>
+                        <p>X: 377000 | Y: 7380000</p>
+                        <br>
+                        <p><strong>Brasília, DF (DMS):</strong></p>
+                        <p>15°47'S 47°52'W</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sistema de abas
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Detectar formato de coordenada
+        function detectCoordinateFormat(coord1, coord2) {
+            const patterns = {
+                dms: /[°′″\']|[NSWE]\s*\d+[°°]/i,
+                utm: /^\d{6,7}(\.\d+)?$/,
+                decimal: /^-?\d+\.\d+$/
+            };
+
+            const test = `${coord1}, ${coord2}`;
+            
+            if (patterns.dms.test(test)) return 'dms';
+            if (patterns.utm.test(coord1) && patterns.utm.test(coord2)) return 'utm';
+            if (patterns.decimal.test(coord1) && patterns.decimal.test(coord2)) return 'decimal';
+            
+            return 'unknown';
+        }
+
+        // Parse DMS para decimal
+        function parseDMS(dms) {
+            try {
+                // Remover espaços extras
+                dms = dms.trim();
+                
+                // Tentar diferentes formatos
+                let match;
+                
+                // Formato: S 1°27'20.88"
+                match = dms.match(/([NS])?\s*(\d+)[°](\d+)[\'′](\d+\.?\d*)[\"″]?/i);
+                if (match) {
+                    let [, dir, deg, min, sec] = match;
+                    let decimal = parseFloat(deg) + parseFloat(min)/60 + parseFloat(sec)/3600;
+                    if (dir && (dir.toUpperCase() === 'S' || dir.toUpperCase() === 'W')) {
+                        decimal = -decimal;
+                    }
+                    return decimal;
+                }
+                
+                // Formato: -01 27 20.88
+                match = dms.match(/(-?)(\d+)\s+(\d+)\s+(\d+\.?\d*)/);
+                if (match) {
+                    let [, sign, deg, min, sec] = match;
+                    let decimal = parseFloat(deg) + parseFloat(min)/60 + parseFloat(sec)/3600;
+                    if (sign === '-') decimal = -decimal;
+                    return decimal;
+                }
+                
+                return null;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        // Decimal para DMS
+        function toDMS(decimal, isLat) {
+            const abs = Math.abs(decimal);
+            const deg = Math.floor(abs);
+            const minFloat = (abs - deg) * 60;
+            const min = Math.floor(minFloat);
+            const sec = ((minFloat - min) * 60).toFixed(2);
+            
+            let dir = '';
+            if (isLat) {
+                dir = decimal >= 0 ? 'N' : 'S';
+            } else {
+                dir = decimal >= 0 ? 'E' : 'W';
+            }
+            
+            return `${dir} ${deg}°${min}'${sec}"`;
+        }
+
+        // Determinar zona UTM a partir de longitude
+        function getUTMZone(longitude) {
+            return Math.floor((longitude + 180) / 6) + 1;
+        }
+
+        // Converter decimal para UTM (simplificado)
+        function latLonToUTM(lat, lon, datum = 'WGS84') {
+            const zone = getUTMZone(lon);
+            const centralMeridian = (zone - 1) * 6 - 180 + 3;
+            
+            // Fator de escala UTM
+            const k0 = 0.9996;
+            
+            // Raio da Terra (WGS84)
+            const a = 6378137.0;
+            const f = 1/298.257223563;
+            const e2 = 2*f - f*f;
+            
+            const radLat = lat * Math.PI / 180;
+            const radLon = lon * Math.PI / 180;
+            const radCM = centralMeridian * Math.PI / 180;
+            
+            const N = a / Math.sqrt(1 - e2 * Math.sin(radLat)**2);
+            const T = Math.tan(radLat)**2;
+            const C = e2 / (1 - e2) * Math.cos(radLat)**2;
+            const A = Math.cos(radLat) * (radLon - radCM);
+            
+            const M = a * ((1 - e2/4 - 3*e2**2/64 - 5*e2**3/256) * radLat
+                - (3*e2/8 + 3*e2**2/32 + 45*e2**3/1024) * Math.sin(2*radLat)
+                + (15*e2**2/256 + 45*e2**3/1024) * Math.sin(4*radLat)
+                - (35*e2**3/3072) * Math.sin(6*radLat));
+            
+            const E = k0 * N * (A + (1-T+C)*A**3/6 
+                + (5-18*T+T**2+72*C-58*e2/(1-e2))*A**5/120) + 500000;
+            
+            const n = (a*f)/(a*(1-f));
+            const alpha = (1/4 + n**2/64 + n**4/256) * a * (1-n) * (1-n**2/4) / (1+n);
+            const beta = (3*n/32 + 3*n**3/256) * a * (1-n) * (1-n**2/4) / (1+n);
+            const gamma = (15*n**2/256 + 45*n**4/4096) * a * (1-n) * (1-n**2/4) / (1+n);
+            
+            const latRadPrime = radLat 
+                - alpha * Math.sin(2*radLat) 
+                + beta * Math.sin(4*radLat) 
+                - gamma * Math.sin(6*radLat);
+            
+            const N_val = k0 * (M + N * Math.tan(radLat) * (A**2/2 
+                + (5-T+9*C+4*C**2)*A**4/24 
+                + (61-58*T+T**2+600*C-330*e2/(1-e2))*A**6/720));
+            
+            return {
+                easting: E.toFixed(2),
+                northing: N_val > 0 ? N_val.toFixed(2) : (10000000 + N_val).toFixed(2),
+                zone: zone,
+                hemisphere: lat >= 0 ? 'N' : 'S'
+            };
+        }
+
+        // Converter UTM para Lat/Lon (simplificado)
+        function UTMToLatLon(easting, northing, zone, hemisphere = 'S') {
+            const k0 = 0.9996;
+            const a = 6378137.0;
+            const f = 1/298.257223563;
+            const e2 = 2*f - f*f;
+            const e4 = e2*e2;
+            const e6 = e4*e2;
+            
+            const x = easting - 500000;
+            let y = northing;
+            
+            if (hemisphere === 'S') {
+                y = y - 10000000;
+            }
+            
+            const M = y / k0;
+            const mu = M / (a * (1 - e2/4 - 3*e2**2/64 - 5*e2**3/256));
+            
+            const phi1 = mu 
+                + (3*e2/2 - 27*e2**3/32) * Math.sin(2*mu)
+                + (21*e2**2/16 - 55*e2**4/32) * Math.sin(4*mu)
+                + (151*e2**3/96) * Math.sin(6*mu);
+            
+            const N1 = a / Math.sqrt(1 - e2 * Math.sin(phi1)**2);
+            const T1 = Math.tan(phi1)**2;
+            const C1 = e2 / (1 - e2) * Math.cos(phi1)**2;
+            const R1 = a * (1 - e2) / (1 - e2 * Math.sin(phi1)**2)**1.5;
+            const D = x / (N1 * k0);
+            
+            const lat = phi1 
+                - (N1 * Math.tan(phi1) / R1) * (D**2/2 - (5+3*T1+10*C1-4*C1**2-9*e2/(1-e2))*D**4/24)
+                + (N1 * Math.tan(phi1) / R1) * ((61+90*T1+298*C1+45*T1**2-252*e2/(1-e2)-3*C1**2)*D**6/720);
+            
+            const lon = (D - (1+2*T1+C1)*D**3/6 + (5-2*C1+28*T1-3*C1**2+8*e2/(1-e2)+24*T1**2)*D**5/120) / Math.cos(phi1);
+            
+            const centralMeridian = (zone - 1) * 6 - 180 + 3;
+            
+            return {
+                latitude: (lat * 180 / Math.PI).toFixed(6),
+                longitude: ((lon * 180 / Math.PI) + centralMeridian).toFixed(6)
+            };
+        }
+
+        // Converter coordenada única
+        function convertSingle() {
+            const coord1 = document.getElementById('inputCoord1').value.trim();
+            const coord2 = document.getElementById('inputCoord2').value.trim();
+            const inputFormat = document.getElementById('inputFormat').value;
+            const datumInput = document.getElementById('datumInput').value;
+            const utmZone = document.getElementById('utmZone').value;
+            const datumOutput = document.getElementById('datumOutput').value;
+            
+            if (!coord1 || !coord2) {
+                alert('Por favor, insira ambas as coordenadas!');
+                return;
+            }
+            
+            let lat, lon;
+            let detectedFormat = inputFormat;
+            
+            // Detectar ou usar formato especificado
+            if (detectedFormat === 'auto') {
+                detectedFormat = detectCoordinateFormat(coord1, coord2);
+            }
+            
+            try {
+                // Converter para decimal
+                if (detectedFormat === 'dms') {
+                    lat = parseDMS(coord1);
+                    lon = parseDMS(coord2);
+                } else if (detectedFormat === 'utm') {
+                    const zone = utmZone !== 'auto' ? parseInt(utmZone) : getUTMZone(parseFloat(coord1) / 1000000);
+                    const result = UTMToLatLon(parseFloat(coord1), parseFloat(coord2), zone, 'S');
+                    lat = parseFloat(result.latitude);
+                    lon = parseFloat(result.longitude);
+                } else {
+                    lat = parseFloat(coord1.replace(',', '.'));
+                    lon = parseFloat(coord2.replace(',', '.'));
+                }
+                
+                if (isNaN(lat) || isNaN(lon)) {
+                    throw new Error('Coordenadas inválidas');
+                }
+                
+                // Validar intervalo
+                if (Math.abs(lat) > 90 || Math.abs(lon) > 180) {
+                    throw new Error('Coordenadas fora do intervalo válido');
+                }
+                
+                // Gerar resultados
+                let results = `<div class="grid-2">`;
+                
+                // Graus decimais
+                results += `
+                    <div class="coord-display">
+                        <strong>Graus Decimais (${datumOutput}):</strong><br>
+                        Latitude: ${lat.toFixed(6)}<br>
+                        Longitude: ${lon.toFixed(6)}
+                    </div>
+                `;
+                
+                // DMS
+                results += `
+                    <div class="coord-display">
+                        <strong>Graus Minutos Segundos:</strong><br>
+                        ${toDMS(lat, true)}<br>
+                        ${toDMS(lon, false)}
+                    </div>
+                `;
+                
+                // UTM
+                const utm = latLonToUTM(lat, lon, datumOutput);
+                results += `
+                    <div class="coord-display">
+                        <strong>UTM (${datumOutput}):</strong><br>
+                        Zona: ${utm.zone}${utm.hemisphere}<br>
+                        E: ${utm.easting} m<br>
+                        N: ${utm.northing} m
+                    </div>
+                `;
+                
+                // Informações adicionais
+                results += `
+                    <div class="coord-display">
+                        <strong>Informações:</strong><br>
+                        Formato detectado: ${detectedFormat.toUpperCase()}<br>
+                        Datum entrada: ${datumInput}<br>
+                        Zona UTM: ${utm.zone}<br>
+                        Meridiano Central: ${(utm.zone - 1) * 6 - 180 + 3}°
+                    </div>
+                `;
+                
+                results += `</div>`;
+                
+                document.getElementById('singleResultContent').innerHTML = results;
+                document.getElementById('singleResult').classList.remove('hidden');
+                
+            } catch (error) {
+                alert('Erro na conversão: ' + error.message);
+            }
+        }
+
+        // Limpar coordenada única
+        function clearSingle() {
+            document.getElementById('inputCoord1').value = '';
+            document.getElementById('inputCoord2').value = '';
+            document.getElementById('singleResult').classList.add('hidden');
+        }
+
+        // Processar lote
+        let batchData = [];
+        
+        function processBatch() {
+            const csvText = document.getElementById('batchInput').value.trim();
+            const format = document.getElementById('batchFormat').value;
+            const datum = document.getElementById('batchDatum').value;
+            
+            if (!csvText) {
+                alert('Por favor, insira dados CSV!');
+                return;
+            }
+            
+            try {
+                const lines = csvText.split('\n').filter(line => line.trim());
+                if (lines.length < 2) {
+                    alert('CSV precisa de cabeçalho e pelo menos uma linha de dados');
+                    return;
+                }
+                
+                const headers = lines[0].split(',').map(h => h.trim());
+                const data = [];
+                
+                for (let i = 1; i < lines.length; i++) {
+                    const values = lines[i].split(',').map(v => v.trim());
+                    const row = {};
+                    headers.forEach((h, idx) => {
+                        row[h] = values[idx];
+                    });
+                    data.push(row);
+                }
+                
+                // Atualizar selects de colunas
+                updateColumnSelects(headers);
+                
+                // Detectar colunas de coordenadas
+                const latCol = document.getElementById('colLat').value || detectLatColumn(headers);
+                const lonCol = document.getElementById('colLon').value || detectLonColumn(headers);
+                
+                if (!latCol || !lonCol) {
+                    alert('Não foi possível detectar colunas de coordenadas. Selecione manualmente.');
+                    return;
+                }
+                
+                // Processar cada linha
+                const processed = [];
+                let errors = 0;
+                
+                data.forEach((row, idx) => {
+                    try {
+                        let lat = parseFloat(row[latCol].replace(',', '.'));
+                        let lon = parseFloat(row[lonCol].replace(',', '.'));
+                        
+                        if (format === 'dms') {
+                            lat = parseDMS(row[latCol]);
+                            lon = parseDMS(row[lonCol]);
+                        }
+                        
+                        if (isNaN(lat) || isNaN(lon)) {
+                            throw new Error('Coordenadas inválidas');
+                        }
+                        
+                        const utm = latLonToUTM(lat, lon, datum);
+                        
+                        processed.push({
+                            ...row,
+                            'Lat_DD': lat.toFixed(6),
+                            'Lon_DD': lon.toFixed(6),
+                            'Lat_DMS': toDMS(lat, true),
+                            'Lon_DMS': toDMS(lon, false),
+                            'UTM_Zone': `${utm.zone}${utm.hemisphere}`,
+                            'UTM_E': utm.easting,
+                            'UTM_N': utm.northing
+                        });
+                    } catch (e) {
+                        errors++;
+                        processed.push({
+                            ...row,
+                            'Error': e.message
+                        });
+                    }
+                });
+                
+                batchData = processed;
+                displayBatchResults(processed, errors, headers);
+                
+            } catch (error) {
+                alert('Erro ao processar: ' + error.message);
+            }
+        }
+
+        function updateColumnSelects(headers) {
+            const latSelect = document.getElementById('colLat');
+            const lonSelect = document.getElementById('colLon');
+            
+            latSelect.innerHTML = '<option value="">Detectar automaticamente</option>';
+            lonSelect.innerHTML = '<option value="">Detectar automaticamente</option>';
+            
+            headers.forEach(h => {
+                latSelect.innerHTML += `<option value="${h}">${h}</option>`;
+                lonSelect.innerHTML += `<option value="${h}">${h}</option>`;
+            });
+        }
+
+        function detectLatColumn(headers) {
+            const latKeywords = ['lat', 'latitude', 'y', 'norte', 'north'];
+            for (const h of headers) {
+                if (latKeywords.some(k => h.toLowerCase().includes(k))) {
+                    return h;
+                }
+            }
+            return headers[0];
+        }
+
+        function detectLonColumn(headers) {
+            const lonKeywords = ['lon', 'long', 'longitude', 'x', 'leste', 'east'];
+            for (const h of headers) {
+                if (lonKeywords.some(k => h.toLowerCase().includes(k))) {
+                    return h;
+                }
+            }
+            return headers[1] || headers[0];
+        }
+
+        function displayBatchResults(data, errors, originalHeaders) {
+            document.getElementById('batchStats').innerHTML = `
+                <strong>Resumo:</strong> ${data.length} registros processados, ${errors} erros
+            `;
+            
+            const table = document.getElementById('batchTable');
+            const thead = table.querySelector('thead');
+            const tbody = table.querySelector('tbody');
+            
+            // Headers
+            const allHeaders = [...originalHeaders, 'Lat_DD', 'Lon_DD', 'Lat_DMS', 'Lon_DMS', 'UTM_Zone', 'UTM_E', 'UTM_N'];
+            thead.innerHTML = '<tr>' + allHeaders.map(h => `<th>${h}</th>`).join('') + '</tr>';
+            
+            // Rows
+            tbody.innerHTML = data.slice(0, 100).map(row => {
+                return '<tr>' + allHeaders.map(h => `<td>${row[h] || '-'}</td>`).join('') + '</tr>';
+            }).join('');
+            
+            document.getElementById('batchResult').classList.remove('hidden');
+        }
+
+        function exportBatch() {
+            if (batchData.length === 0) {
+                alert('Nenhum dado para exportar!');
+                return;
+            }
+            
+            const headers = Object.keys(batchData[0]);
+            const csv = [
+                headers.join(','),
+                ...batchData.map(row => headers.map(h => `"${row[h] || ''}"`).join(','))
+            ].join('\n');
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'coordenadas_convertidas.csv';
+            a.click();
+        }
+
+        function clearBatch() {
+            document.getElementById('batchInput').value = '';
+            document.getElementById('batchResult').classList.add('hidden');
+            batchData = [];
+        }
+
+        // Detectar formato
+        function detectFormat() {
+            const input = document.getElementById('detectInput').value.trim();
+            
+            if (!input) {
+                alert('Por favor, insira coordenadas para detecção!');
+                return;
+            }
+            
+            const lines = input.split('\n').filter(l => l.trim());
+            const results = [];
+            
+            lines.forEach(line => {
+                const parts = line.split(/[,\t;]/).map(p => p.trim()).filter(p => p);
+                if (parts.length >= 2) {
+                    const format = detectCoordinateFormat(parts[0], parts[1]);
+                    let lat, lon;
+                    
+                    if (format === 'dms') {
+                        lat = parseDMS(parts[0]);
+                        lon = parseDMS(parts[1]);
+                    } else {
+                        lat = parseFloat(parts[0].replace(',', '.'));
+                        lon = parseFloat(parts[1].replace(',', '.'));
+                    }
+                    
+                    const info = {
+                        original: line,
+                        format: format,
+                        lat: !isNaN(lat) ? lat.toFixed(6) : 'N/A',
+                        lon: !isNaN(lon) ? lon.toFixed(6) : 'N/A',
+                        utmZone: !isNaN(lon) ? getUTMZone(lon) : 'N/A'
+                    };
+                    
+                    if (!isNaN(lat) && !isNaN(lon)) {
+                        const utm = latLonToUTM(lat, lon);
+                        info.utm = `${utm.easting}E, ${utm.northing}N (Zona ${utm.zone}${utm.hemisphere})`;
+                    }
+                    
+                    results.push(info);
+                }
+            });
+            
+            let output = '<table><thead><tr><th>Linha</th><th>Formato</th><th>Latitude</th><th>Longitude</th><th>UTM</th></tr></thead><tbody>';
+            results.forEach(r => {
+                output += `<tr>
+                    <td>${r.original.substring(0, 30)}...</td>
+                    <td>${r.format.toUpperCase()}</td>
+                    <td>${r.lat}</td>
+                    <td>${r.lon}</td>
+                    <td>${r.utm || 'N/A'}</td>
+                </tr>`;
+            });
+            output += '</tbody></table>';
+            
+            document.getElementById('detectResultContent').innerHTML = output;
+            document.getElementById('detectResult').classList.remove('hidden');
+        }
+
+        // File upload handler
+        document.getElementById('fileUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('batchInput').value = e.target.result;
+            };
+            reader.readAsText(file);
+        });
+    </script>
+</body>
+</html>
