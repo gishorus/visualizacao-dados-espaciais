@@ -1,17 +1,1 @@
-# R
-.Rhistory
-.RData
-.Ruserdata
-*.Rproj.user/
-
-# Dados gerados
-dados/*.gpkg
-dados/*.shp
-dados/*.shx
-dados/*.dbf
-mapas/*.png
-mapas/*.jpg
-
-# Sistema
-.DS_Store
-Thumbs.db
+Nothing should be ignored based on the provided file changes. The only added file is `ConversorCoordenadas.html`, which is a source file and should not be ignored.
